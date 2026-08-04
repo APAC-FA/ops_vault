@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ops Vault — Five Acts Services Corp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f7fa;
+    --panel:#ffffff;
+    --panel-2:#eef2f6;
+    --panel-3:#e6ecf2;
+    --line:#e1e7ee;
+    --line-soft:#ecf0f5;
+    --navy:#0e3a5f;
+    --navy-dim:#134a76;
+    --accent:#12a594;
+    --accent-dim:#0d7c70;
+    --accent-glow: rgba(18,165,148,0.12);
+    --ok:#1f9d6c;
+    --ok-dim: rgba(31,157,108,0.12);
+    --no:#d64545;
+    --no-dim: rgba(214,69,69,0.10);
+    --text:#132436;
+    --text-dim:#5b6b7c;
+    --text-faint:#8fa0af;
+    --mono:'IBM Plex Mono',monospace;
+    --sans:'Inter',sans-serif;
+    --display:'Manrope',sans-serif;
+    --radius:10px;
+    --shadow: 0 1px 2px rgba(19,36,54,0.04), 0 6px 16px rgba(19,36,54,0.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--sans);height:100%;-webkit-font-smoothing:antialiased;}
+  body{display:flex;min-height:100vh;}
+  ::selection{background:var(--accent-glow);color:var(--text);}
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    width:260px;flex:0 0 260px;background:var(--panel);border-right:1px solid var(--line);
+    display:flex;flex-direction:column;padding:22px 0 16px;position:sticky;top:0;height:100vh;overflow-y:auto;
+  }
+  .brand{padding:0 20px 18px;border-bottom:1px solid var(--line-soft);margin-bottom:14px;}
+  .brand .mark{
+    width:38px;height:38px;border-radius:11px;background:linear-gradient(155deg,var(--navy),var(--accent));
+    display:flex;align-items:center;justify-content:center;margin-bottom:12px;box-shadow:var(--shadow);
+  }
+  .brand .mark svg{width:19px;height:19px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .brand h1{font-family:var(--display);font-size:16px;letter-spacing:-.01em;margin:0;font-weight:800;color:var(--navy);}
+  .brand p{font-family:var(--sans);font-size:11.5px;color:var(--text-faint);margin:4px 0 0;font-weight:500;}
+  .brand .tagline{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--accent-dim);margin:8px 0 0;text-transform:uppercase;}
+
+  .nav{padding:0 10px;}
+  .nav-item{
+    display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;
+    color:var(--text-dim);font-size:13.5px;cursor:pointer;font-family:var(--sans);font-weight:600;
+    border-left:2px solid transparent;margin-bottom:2px;transition:background .12s,color .12s;
+  }
+  .nav-item .num{font-family:var(--mono);font-size:10px;color:var(--text-faint);width:16px;}
+  .nav-item:hover{background:var(--panel-2);color:var(--text);}
+  .nav-item.active{background:var(--accent-glow);color:var(--accent-dim);border-left-color:var(--accent);}
+  .nav-item.active .num{color:var(--accent);}
+
+  .sidebar-section-label{
+    font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--text-faint);
+    text-transform:uppercase;padding:18px 20px 8px;
+  }
+  .client-filters{padding:0 10px;flex:1;overflow-y:auto;}
+  .client-chip{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 12px;border-radius:8px;
+    font-size:13px;color:var(--text-dim);cursor:pointer;margin-bottom:1px;font-weight:500;
+  }
+  .client-chip:hover{background:var(--panel-2);color:var(--text);}
+  .client-chip.active{background:var(--accent-glow);color:var(--accent-dim);}
+  .client-chip .count{font-family:var(--mono);font-size:10px;color:var(--text-faint);}
+  .client-chip.active .count{color:var(--accent-dim);}
+
+  .sidebar-footer{padding:14px 20px 0;border-top:1px solid var(--line-soft);margin-top:10px;}
+  .status-line{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;color:var(--text-faint);margin-bottom:10px;}
+  .status-dot{width:6px;height:6px;border-radius:50%;background:var(--ok);flex:0 0 auto;box-shadow:0 0 0 3px var(--ok-dim);}
+  .refresh-btn{
+    width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--text-dim);font-family:var(--sans);
+    font-weight:600;font-size:12.5px;padding:9px;border-radius:8px;cursor:pointer;
+  }
+  .refresh-btn:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-glow);}
+
+  /* ---------- Main ---------- */
+  .main{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .topbar{
+    position:sticky;top:0;z-index:5;background:rgba(244,247,250,0.92);backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);padding:22px 32px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  }
+  .topbar h2{margin:0;font-family:var(--display);font-size:21px;font-weight:800;letter-spacing:-.01em;flex:0 0 auto;color:var(--navy);}
+  .topbar .sub{font-family:var(--sans);font-size:12.5px;color:var(--text-dim);margin-top:3px;}
+  .topbar-title{margin-right:auto;}
+  .search-wrap{position:relative;width:270px;}
+  .search-wrap input{
+    width:100%;background:var(--panel);border:1px solid var(--line);color:var(--text);
+    padding:10px 12px 10px 34px;border-radius:8px;font-family:var(--sans);font-size:13.5px;box-shadow:var(--shadow);
+  }
+  .search-wrap input:focus{outline:none;border-color:var(--accent);}
+  .search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:var(--text-faint);}
+  .btn{
+    font-family:var(--sans);font-weight:700;font-size:13.5px;padding:10px 16px;border-radius:8px;
+    border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer;white-space:nowrap;box-shadow:var(--shadow);
+  }
+  .btn:hover{background:var(--accent-dim);border-color:var(--accent-dim);}
+  .btn.ghost{background:var(--panel);border-color:var(--line);color:var(--text-dim);box-shadow:none;}
+  .btn.ghost:hover{border-color:var(--text-dim);color:var(--text);background:var(--panel-2);}
+  .btn.small{padding:6px 12px;font-size:12.5px;}
+  .btn.danger{border-color:var(--no);color:var(--no);background:#fff;}
+  .btn.danger:hover{background:var(--no);color:#fff;}
+
+  .content{padding:28px 32px 80px;max-width:1080px;}
+  .empty-note{color:var(--text-faint);font-size:13.5px;font-family:var(--sans);padding:30px 0;}
+
+  /* group / card layout */
+  .group{margin-bottom:28px;}
+  .group-head{
+    display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:9px;border-bottom:1px solid var(--line);
+  }
+  .group-head h3{margin:0;font-family:var(--display);font-size:15px;font-weight:800;letter-spacing:-.005em;color:var(--navy);}
+  .group-head .tag{
+    font-family:var(--mono);font-size:10px;color:var(--accent-dim);background:var(--accent-glow);
+    padding:2px 8px;border-radius:20px;border:1px solid rgba(18,165,148,0.25);
+  }
+  .group-head .add-inline{margin-left:auto;}
+
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px;
+    position:relative;box-shadow:var(--shadow);transition:border-color .12s;
+  }
+  .card:hover{border-color:#cfdae4;}
+  .card:hover .card-actions{opacity:1;}
+  .card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+  .card-title{font-weight:700;font-size:14.5px;color:var(--text);font-family:var(--sans);}
+  .card-meta{font-family:var(--mono);font-size:10.5px;color:var(--accent-dim);margin-top:4px;text-transform:uppercase;letter-spacing:.04em;}
+  .card-body{margin-top:9px;font-size:13.5px;line-height:1.6;color:var(--text-dim);white-space:pre-wrap;}
+  .card-body a{color:var(--accent-dim);}
+  .card-actions{opacity:0;transition:opacity .12s;display:flex;gap:6px;flex:0 0 auto;}
+  .icon-btn{
+    width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:7px;
+    border:1px solid var(--line);background:var(--panel-2);cursor:pointer;
+  }
+  .icon-btn svg{width:13px;height:13px;stroke:var(--text-dim);}
+  .icon-btn:hover{border-color:var(--accent);background:var(--accent-glow);}
+  .icon-btn:hover svg{stroke:var(--accent-dim);}
+  .icon-btn.del:hover{border-color:var(--no);background:var(--no-dim);}
+  .icon-btn.del:hover svg{stroke:var(--no);}
+
+  .empty-url{color:var(--text-faint);font-style:italic;}
+
+  /* form */
+  .edit-form{display:flex;flex-direction:column;gap:10px;}
+  .edit-form label{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--text-faint);text-transform:uppercase;}
+  .edit-form input[type=text], .edit-form textarea, .edit-form select{
+    width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--text);
+    padding:9px 11px;border-radius:8px;font-family:var(--sans);font-size:13.5px;resize:vertical;
+  }
+  .edit-form input:focus, .edit-form textarea:focus, .edit-form select:focus{outline:none;border-color:var(--accent);background:var(--panel);}
+  .edit-form textarea{min-height:70px;}
+  .form-row{display:flex;gap:8px;}
+  .form-actions{display:flex;gap:8px;margin-top:2px;}
+
+  /* Name change table */
+  .nc-table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+  .nc-table th{
+    text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);
+    padding:12px 16px;border-bottom:1px solid var(--line);background:var(--panel-2);
+  }
+  .nc-table td{padding:11px 16px;border-bottom:1px solid var(--line-soft);font-size:13.5px;}
+  .nc-table tr:last-child td{border-bottom:none;}
+  .nc-table tr:hover{background:var(--panel-2);}
+  .nc-client{font-weight:600;}
+  .stamp{
+    font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;padding:4px 10px;border-radius:20px;
+    display:inline-block;text-transform:uppercase;cursor:pointer;border:1px solid transparent;
+  }
+  .stamp.yes{color:var(--ok);background:var(--ok-dim);border-color:rgba(31,157,108,0.3);}
+  .stamp.no{color:var(--no);background:var(--no-dim);border-color:rgba(214,69,69,0.3);}
+  .stamp.unknown{color:var(--text-faint);background:var(--panel-2);border-color:var(--line);}
+  .nc-actions{opacity:0;transition:opacity .12s;}
+  .nc-table tr:hover .nc-actions{opacity:1;}
+
+  .who-input{
+    font-family:var(--sans);font-size:12.5px;background:var(--panel-2);border:1px solid var(--line);color:var(--text);
+    padding:8px 10px;border-radius:8px;width:100%;
+  }
+  .who-input:focus{outline:none;border-color:var(--accent);}
+
+  @media (max-width:860px){
+    .sidebar{position:fixed;left:-270px;transition:left .18s;z-index:20;box-shadow:0 0 40px rgba(19,36,54,.18);}
+    .sidebar.open{left:0;}
+    .topbar{padding:16px;}
+    .content{padding:18px 16px 60px;}
+    .search-wrap{width:100%;order:3;}
+    .mobile-toggle{display:flex !important;}
+  }
+  .mobile-toggle{
+    display:none;width:36px;height:36px;border:1px solid var(--line);border-radius:8px;
+    align-items:center;justify-content:center;cursor:pointer;background:var(--panel);flex:0 0 auto;box-shadow:var(--shadow);
+  }
+  .mobile-toggle svg{width:16px;height:16px;stroke:var(--text-dim);}
+</style>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="mark"><svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 8.7 8 10 4.6-1.3 8-5 8-10V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg></div>
+    <h1>Ops Vault</h1>
+    <p>Client policy &amp; FAQ ledger</p>
+    <p class="tagline">Secure · Reliable · Remote</p>
+  </div>
+  <div class="nav" id="nav"></div>
+  <div class="sidebar-section-label">Filter by client</div>
+  <div class="client-filters" id="clientFilters"></div>
+  <div class="sidebar-footer">
+    <div class="status-line"><span class="status-dot"></span><span id="statusText">loading…</span></div>
+    <input class="who-input" id="whoInput" placeholder="Editing as (your name)" style="margin-bottom:8px;">
+    <button class="refresh-btn" id="refreshBtn">↻ Refresh now</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="mobile-toggle" id="mobileToggle">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </div>
+    <div class="topbar-title">
+      <h2 id="sectionTitle">Exam Policies</h2>
+      <div class="sub" id="sectionSub">—</div>
+    </div>
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="searchInput" type="text" placeholder="Search client, keyword…">
+    </div>
+    <button class="btn" id="addTopBtn">+ Add entry</button>
+  </div>
+  <div class="content" id="content"></div>
+</div>
+
+<script>
+/* ============================= CONFIG ============================= */
+const SECTIONS = {
+  policies:  { label:'Exam Policies',      sub:'Duration, breaks, and rules per exam/client', grouped:true,
+               fields:[{key:'client',label:'Client / Exam'},{key:'details',label:'Policy details',textarea:true}] },
+  namechange:{ label:'Name-Change Policy',  sub:'Is a name change allowed on the certificate?', grouped:false,
+               fields:[{key:'client',label:'Client'},{key:'allowed',label:'Allowed?',select:['Yes','No','Unknown']}] },
+  faqs:      { label:'FAQs',                sub:'Frequently asked questions, grouped by client', grouped:true,
+               fields:[{key:'client',label:'Client'},{key:'category',label:'Category (e.g. General, Breaks, Results)'},{key:'question',label:'Question'},{key:'answer',label:'Answer',textarea:true}] },
+  websites:  { label:'Client Websites',     sub:'Portal / booking links per client', grouped:true,
+               fields:[{key:'client',label:'Client'},{key:'url',label:'Website URL'},{key:'notes',label:'Notes',textarea:true}] },
+  remote:    { label:'Remote Desktop App',  sub:'Remote-access tooling notes per client', grouped:true,
+               fields:[{key:'client',label:'Client'},{key:'app',label:'App / tool name'},{key:'notes',label:'Notes',textarea:true}] },
+};
+const STORAGE_KEY = 'ops-vault-data-v1';
+let activeSection = 'policies';
+let activeClient = null;
+let searchTerm = '';
+let data = null;
+let dataRaw = null; // last serialized string, to detect remote changes
+
+/* ============================= SEED DATA ============================= */
+function seedData(){
+  return {
+    policies:[
+      {id:uid(),client:'General Policy',details:'Allowed one 5-minute break as a courtesy to the candidate (applies broadly unless a client-specific policy overrides it below).'},
+      {id:uid(),client:'NRPP',details:''},
+      {id:uid(),client:'HashiCorp',details:'VAULT exam: 240 minutes.\nAZURE (BETA): 240/270 minutes.\nAssociate: 60 minutes.'},
+      {id:uid(),client:'SS&C Blue Prism',details:''},
+      {id:uid(),client:'NVIDIA',details:'Standard exam: 120 minutes.\nBETA exam: 180 minutes.\nAllowed one 5-minute break.'},
+      {id:uid(),client:'InterSystems',details:'InterSystems IRIS System Administration Specialist exam.'},
+      {id:uid(),client:'SideFX',details:''},
+      {id:uid(),client:'CASBO',details:''},
+      {id:uid(),client:'Atlassian',details:'Jira Essential: 60 minutes.\nManaging Jira Projects for Cloud: 180 minutes.\nJira Administration for Cloud: 180 minutes.'},
+      {id:uid(),client:'Zscaler',details:'ZDTA-CS/PS exam.'},
+      {id:uid(),client:'Akylade',details:''},
+      {id:uid(),client:'WellSky',details:'Allowed 5 minutes per break.'},
+      {id:uid(),client:'BMC',details:''},
+      {id:uid(),client:'Project Success',details:''},
+      {id:uid(),client:'Docusign',details:''},
+      {id:uid(),client:'Camunda',details:''},
+      {id:uid(),client:'OpenText',details:''},
+    ],
+    namechange:[
+      ['Akylade','Yes'],['Atlassian','No'],['BluePrism','Yes'],['BMC','No'],['Braze','Yes'],
+      ['Camunda','Yes'],['CASBO','Yes'],['CIW/Certification Partners','Yes'],['Collibra','No'],
+      ['Docusign','No'],['F5 Certified','No'],['HashiCorp','No'],['InterSystems','No'],['NRPP','Yes'],
+      ['NVIDIA','Yes'],['ProofPoint','Yes'],['Stripe','Yes'],['Toast','No'],['WellSky','Yes'],
+      ['WindRiver','Yes'],['Zscaler','No'],['OpenText','No'],['Webflow','No'],["Moody's",'Unknown'],
+      ['Project Success','Yes'],
+    ].map(([client,allowed])=>({id:uid(),client,allowed})),
+    faqs:[
+      {id:uid(),client:'HashiCorp',category:'General',question:'What happens if I lose internet access during my appointment?',answer:'If the candidate is not able to return to the exam, a voucher will be issued. A member of the support team will follow up with next steps.'},
+      {id:uid(),client:'HashiCorp',category:'General',question:'Can I use an external webcam?',answer:'Yes, as long as it meets the minimum requirements. It must be able to do a full scan of the testing environment and clearly show the text on your ID.'},
+      {id:uid(),client:'HashiCorp',category:'General',question:'Can I use an external monitor?',answer:'Only one monitor may be used during the exam. If using an external monitor, the laptop screen must be closed, and the external monitor must have a webcam that stays on throughout — the laptop webcam cannot be used at the same time.'},
+      {id:uid(),client:'HashiCorp',category:'General',question:'How do I reschedule my appointment?',answer:'More than 24 hours before your appointment:\n1. Log in to the HashiCorp Cloud Engineer Certification Exam Portal.\n2. Navigate to Certiverse via the left-side menu.\n3. From the Certiverse Exam Dashboard, find your appointment.\n4. Select Reschedule and pick a new date/time.'},
+      {id:uid(),client:'HashiCorp',category:'General',question:'How do I cancel my appointment?',answer:'More than 24 hours before your appointment:\n1. Log in to the HashiCorp Cloud Engineer Certification Exam Portal.\n2. Navigate to Certiverse via the left-side menu.\n3. Find your appointment on the Certiverse Exam Dashboard.\n4. Select Cancel Booking.\nVoucher payments are reinstated with original expiration/restrictions. Card payments are refunded, which can take up to 10 business days.'},
+      {id:uid(),client:'HashiCorp',category:'General',question:'Can I use a calculator?',answer:'Calculators are prohibited. A calculator is available within the exam itself. Using an external one may result in the exam being terminated.'},
+      {id:uid(),client:'HashiCorp',category:'General',question:'How do I open Task Manager on a Mac?',answer:'Press CMD + ALT + ESC simultaneously.'},
+      {id:uid(),client:'SS&C Blue Prism',category:'Exam Results',question:'When will I see my results?',answer:'Results appear immediately after the exam ends. A Certiverse email with a score report link is also sent. Score reports can be viewed anytime under History on the Certiverse Exam Dashboard.'},
+      {id:uid(),client:'NVIDIA',category:'Exam Results',question:'When will I see my results?',answer:'Results are shown on screen at the end of the exam and communicated by email within up to 24 hours. Digital credentials are emailed within 24 hours — log into Credly to accept the badge (instructions are in the invitation email).'},
+      {id:uid(),client:'HashiCorp',category:'Exam Results',question:'HASHI-ASSOC — when will I see my results?',answer:'Pass/fail status is available in the Certiverse system immediately upon completing the exam.'},
+      {id:uid(),client:'HashiCorp',category:'Exam Results',question:'HASHI-VAULT — when will I see my results?',answer:'An email with results is sent within 48 hours after the appointment.'},
+      {id:uid(),client:'General',category:'Exam Results',question:'What does a "red screen" mean?',answer:'It means the system may have detected something that should not be opened or done during the exam.'},
+      {id:uid(),client:'NVIDIA',category:'Breaks',question:'How many breaks am I allowed?',answer:'One 5-minute break is allowed. You may request it at any point in the exam — the exam pauses and resumes on your return. If the break runs longer than 5 minutes, the exam will be terminated.'},
+    ],
+    websites:[
+      'NRPP','HashiCorp','SS&C Blue Prism','NVIDIA','InterSystems','SideFX','CASBO','Atlassian','Zscaler',
+      'Akylade','WellSky','BMC','Project Success','Docusign','Camunda','OpenText','Braze',
+      'CIW/Certification Partners','Collibra','F5 Certified','ProofPoint','Stripe','Toast','WindRiver','Webflow',"Moody's"
+    ].map(client=>({id:uid(),client,url:'',notes:''})),
+    remote:[],
+  };
+}
+function uid(){ return Math.random().toString(36).slice(2,10); }
+
+/* ============================= STORAGE ============================= */
+async function loadData(){
+  try{
+    const res = await window.storage.get(STORAGE_KEY, true);
+    if(res && res.value){
+      data = JSON.parse(res.value);
+      dataRaw = res.value;
+      setStatus('synced — shared with your team');
+    } else {
+      data = seedData();
+      await persist();
+      setStatus('vault initialized');
+    }
+  }catch(e){
+    console.error('load failed, using local seed', e);
+    if(!data) data = seedData();
+    setStatus('offline — changes may not sync', true);
+  }
+  render();
+}
+async function persist(){
+  try{
+    const str = JSON.stringify(data);
+    const res = await window.storage.set(STORAGE_KEY, str, true);
+    if(res){ dataRaw = str; setStatus('saved — visible to your team'); }
+    else { setStatus('save failed, will retry', true); }
+  }catch(e){
+    console.error('save failed', e);
+    setStatus('save failed, will retry', true);
+  }
+}
+async function pollForChanges(){
+  try{
+    const res = await window.storage.get(STORAGE_KEY, true);
+    if(res && res.value && res.value !== dataRaw){
+      data = JSON.parse(res.value);
+      dataRaw = res.value;
+      render();
+      setStatus('updated by a teammate just now');
+    }
+  }catch(e){ /* silent */ }
+}
+function setStatus(text, warn){
+  const el = document.getElementById('statusText');
+  el.textContent = text;
+  const dot = document.querySelector('.status-dot');
+  dot.style.background = warn ? 'var(--no)' : 'var(--ok)';
+  dot.style.boxShadow = '0 0 0 3px ' + (warn ? 'var(--no-dim)' : 'var(--ok-dim)');
+}
+function whoAmI(){
+  return (document.getElementById('whoInput').value || '').trim() || 'Someone';
+}
+
+/* ============================= NAV / SIDEBAR ============================= */
+let clientProfileMode = false; // when true, sidebar client click shows a cross-section profile
+
+function renderNav(){
+  const nav = document.getElementById('nav');
+  nav.innerHTML = '';
+  Object.entries(SECTIONS).forEach(([key,cfg],i)=>{
+    const div = document.createElement('div');
+    div.className = 'nav-item' + (key===activeSection && !clientProfileMode ? ' active' : '');
+    div.innerHTML = `<span class="num">0${i+1}</span><span>${cfg.label}</span>`;
+    div.onclick = ()=>{ activeSection = key; activeClient = null; clientProfileMode = false; render(); };
+    nav.appendChild(div);
+  });
+}
+// Every client name across every section, so the sidebar always reflects the whole vault
+function allClientsGlobal(){
+  const set = new Set();
+  Object.keys(SECTIONS).forEach(sectionKey=>{
+    (data[sectionKey]||[]).forEach(r=>{ if(r.client) set.add(r.client); });
+  });
+  return Array.from(set).sort((a,b)=>a.localeCompare(b));
+}
+function countForClient(clientName){
+  let total = 0;
+  Object.keys(SECTIONS).forEach(sectionKey=>{
+    total += (data[sectionKey]||[]).filter(r=>r.client===clientName).length;
+  });
+  return total;
+}
+function renderClientFilters(){
+  const wrap = document.getElementById('clientFilters');
+  const clients = allClientsGlobal();
+  wrap.innerHTML = '';
+  const allChip = document.createElement('div');
+  allChip.className = 'client-chip' + (!clientProfileMode ? ' active':'');
+  const totalCount = Object.keys(SECTIONS).reduce((sum,k)=> sum + (data[k]||[]).length, 0);
+  allChip.innerHTML = `<span>All clients</span><span class="count">${totalCount}</span>`;
+  allChip.onclick = ()=>{ activeClient=null; clientProfileMode=false; render(); };
+  wrap.appendChild(allChip);
+  if(clients.length===0){
+    const none = document.createElement('div');
+    none.style.cssText = 'padding:6px 12px;color:var(--text-faint);font-size:11.5px;font-family:var(--mono);';
+    none.textContent = 'No clients filed yet';
+    wrap.appendChild(none);
+    return;
+  }
+  clients.forEach(c=>{
+    const count = countForClient(c);
+    const chip = document.createElement('div');
+    chip.className = 'client-chip' + (clientProfileMode && activeClient===c ? ' active':'');
+    chip.innerHTML = `<span>${esc(c)}</span><span class="count">${count}</span>`;
+    chip.onclick = ()=>{
+      activeClient = c;
+      clientProfileMode = true;
+      render();
+    };
+    wrap.appendChild(chip);
+  });
+}
+
+/* ============================= HELPERS ============================= */
+function esc(s){
+  return String(s??'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function linkify(text){
+  const e = esc(text);
+  return e.replace(/(https?:\/\/[^\s<]+)/g, url=>`<a href="${url}" target="_blank" rel="noopener">${url}</a>`);
+}
+function matchesSearch(record){
+  if(!searchTerm) return true;
+  const t = searchTerm.toLowerCase();
+  return Object.values(record).some(v=> String(v||'').toLowerCase().includes(t));
+}
+
+/* ============================= RENDER ============================= */
+function render(){
+  renderNav();
+  renderClientFilters();
+  const addTopBtn = document.getElementById('addTopBtn');
+
+  if(clientProfileMode && activeClient){
+    document.getElementById('sectionTitle').textContent = activeClient;
+    document.getElementById('sectionSub').textContent = 'Everything on file for this client — exam policies, name-change policy, FAQs, website';
+    addTopBtn.style.display = 'none';
+    renderClientProfile(activeClient);
+    return;
+  }
+  addTopBtn.style.display = '';
+
+  const cfg = SECTIONS[activeSection];
+  document.getElementById('sectionTitle').textContent = cfg.label;
+  document.getElementById('sectionSub').textContent = cfg.sub;
+  const content = document.getElementById('content');
+  content.innerHTML = '';
+
+  if(activeSection === 'namechange'){ renderNameChangeTable(content); return; }
+
+  let records = (data[activeSection]||[]).filter(matchesSearch);
+
+  if(records.length===0){
+    content.innerHTML = '<div class="empty-note">Nothing here yet. Use "+ Add entry" to file the first record.</div>';
+    return;
+  }
+
+  // group by client
+  const groups = {};
+  records.forEach(r=>{
+    const g = r.client || 'Unassigned';
+    if(!groups[g]) groups[g]=[];
+    groups[g].push(r);
+  });
+  Object.keys(groups).sort((a,b)=>a.localeCompare(b)).forEach(clientName=>{
+    const groupEl = document.createElement('div');
+    groupEl.className = 'group';
+    groupEl.innerHTML = `<div class="group-head"><h3>${esc(clientName)}</h3><span class="tag">${groups[clientName].length}</span></div>`;
+    const list = document.createElement('div');
+    groups[clientName].forEach(rec=> list.appendChild(renderCard(rec, activeSection)) );
+    groupEl.appendChild(list);
+    content.appendChild(groupEl);
+  });
+}
+
+/* ============================= CLIENT PROFILE (all sections, one client) ============================= */
+function renderClientProfile(clientName){
+  const content = document.getElementById('content');
+  content.innerHTML = '';
+
+  const order = ['policies','namechange','faqs','websites','remote'];
+  order.forEach(sectionKey=>{
+    const cfg = SECTIONS[sectionKey];
+    const records = (data[sectionKey]||[]).filter(r=>r.client===clientName).filter(matchesSearch);
+
+    const groupEl = document.createElement('div');
+    groupEl.className = 'group';
+    const head = document.createElement('div');
+    head.className = 'group-head';
+    head.innerHTML = `<h3>${esc(cfg.label)}</h3><span class="tag">${records.length}</span>`;
+    groupEl.appendChild(head);
+
+    if(sectionKey === 'namechange'){
+      const list = document.createElement('div');
+      if(records.length===0){
+        const addBtn = document.createElement('button');
+        addBtn.className = 'btn ghost small add-inline';
+        addBtn.textContent = '+ File name-change status';
+        addBtn.onclick = async ()=>{
+          const rec = {id:uid(), client:clientName, allowed:'Unknown'};
+          data.namechange.unshift(rec);
+          rec._editedBy = whoAmI(); rec._editedAt = new Date().toISOString();
+          await persist();
+          render();
+        };
+        head.appendChild(addBtn);
+        list.innerHTML = '<div class="empty-note" style="padding:6px 0;">Not filed yet.</div>';
+      } else {
+        records.forEach(rec=> list.appendChild(renderNameChangeCard(rec)) );
+      }
+      groupEl.appendChild(list);
+    } else {
+      const addBtn = document.createElement('button');
+      addBtn.className = 'btn ghost small add-inline';
+      addBtn.textContent = '+ Add';
+      addBtn.onclick = ()=> addNewRecord(sectionKey, clientName);
+      head.appendChild(addBtn);
+
+      const list = document.createElement('div');
+      if(records.length===0){
+        list.innerHTML = '<div class="empty-note" style="padding:6px 0;">Not filed yet.</div>';
+      } else {
+        records.forEach(rec=> list.appendChild(renderCard(rec, sectionKey)) );
+      }
+      groupEl.appendChild(list);
+    }
+    content.appendChild(groupEl);
+  });
+}
+
+function renderNameChangeCard(rec){
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.dataset.id = rec.id;
+  const stampClass = rec.allowed==='Yes' ? 'yes' : rec.allowed==='No' ? 'no' : 'unknown';
+  card.innerHTML = `
+    <div class="card-top">
+      <div>
+        <div class="card-title">Name change allowed?</div>
+        <div class="card-meta">Name-change policy</div>
+      </div>
+      <div class="card-actions">
+        <div class="icon-btn del del-btn" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></div>
+      </div>
+    </div>
+    <div class="card-body"><span class="stamp ${stampClass} stamp-toggle">${esc(rec.allowed||'Unknown')}</span></div>
+  `;
+  card.querySelector('.stamp-toggle').onclick = async ()=>{
+    const cycle = ['Yes','No','Unknown'];
+    rec.allowed = cycle[(cycle.indexOf(rec.allowed||'Unknown')+1)%cycle.length];
+    rec._editedBy = whoAmI(); rec._editedAt = new Date().toISOString();
+    await persist();
+    render();
+  };
+  card.querySelector('.del-btn').onclick = ()=> deleteRecord(rec.id, 'namechange');
+  return card;
+}
+
+function renderCard(rec, sectionKey){
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.dataset.id = rec.id;
+
+  let titleText, bodyHtml, metaText;
+  if(sectionKey==='policies'){
+    titleText = rec.client;
+    bodyHtml = rec.details ? linkify(rec.details) : '<span class="empty-url">No details filed yet.</span>';
+    metaText = 'Exam policy';
+  } else if(sectionKey==='faqs'){
+    titleText = rec.question || '(untitled question)';
+    bodyHtml = rec.answer ? linkify(rec.answer) : '<span class="empty-url">No answer filed yet.</span>';
+    metaText = (rec.category || 'General');
+  } else if(sectionKey==='websites'){
+    titleText = rec.client;
+    bodyHtml = (rec.url ? `<a href="${esc(rec.url)}" target="_blank" rel="noopener">${esc(rec.url)}</a>` : '<span class="empty-url">No URL filed yet.</span>') + (rec.notes ? '<br><br>'+linkify(rec.notes) : '');
+    metaText = 'Website';
+  } else if(sectionKey==='remote'){
+    titleText = rec.app ? rec.app : rec.client;
+    bodyHtml = (rec.app && rec.app!==rec.client ? `<strong>${esc(rec.client)}</strong><br>` : '') + (rec.notes ? linkify(rec.notes) : '<span class="empty-url">No notes filed yet.</span>');
+    metaText = 'Remote desktop app';
+  }
+
+  card.innerHTML = `
+    <div class="card-top">
+      <div>
+        <div class="card-title">${esc(titleText)}</div>
+        <div class="card-meta">${esc(metaText)}</div>
+      </div>
+      <div class="card-actions">
+        <div class="icon-btn edit-btn" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+        <div class="icon-btn del del-btn" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></div>
+      </div>
+    </div>
+    <div class="card-body">${bodyHtml}</div>
+  `;
+  card.querySelector('.edit-btn').onclick = ()=> openEditForm(card, rec, sectionKey);
+  card.querySelector('.del-btn').onclick = ()=> deleteRecord(rec.id, sectionKey);
+  return card;
+}
+
+function openEditForm(card, rec, sectionKey){
+  const cfg = SECTIONS[sectionKey];
+  const form = document.createElement('div');
+  form.className = 'edit-form';
+  let fieldsHtml = '';
+  cfg.fields.forEach(f=>{
+    const val = esc(rec[f.key]||'');
+    if(f.textarea){
+      fieldsHtml += `<div><label>${esc(f.label)}</label><textarea data-key="${f.key}">${val}</textarea></div>`;
+    } else if(f.select){
+      const opts = f.select.map(o=>`<option value="${o}" ${rec[f.key]===o?'selected':''}>${o}</option>`).join('');
+      fieldsHtml += `<div><label>${esc(f.label)}</label><select data-key="${f.key}">${opts}</select></div>`;
+    } else {
+      fieldsHtml += `<div><label>${esc(f.label)}</label><input type="text" data-key="${f.key}" value="${val}"></div>`;
+    }
+  });
+  form.innerHTML = fieldsHtml + `<div class="form-actions"><button class="btn small save-btn">Save</button><button class="btn ghost small cancel-btn">Cancel</button></div>`;
+  card.innerHTML = '';
+  card.appendChild(form);
+  form.querySelector('.save-btn').onclick = async ()=>{
+    cfg.fields.forEach(f=>{
+      const el = form.querySelector(`[data-key="${f.key}"]`);
+      rec[f.key] = el.value;
+    });
+    rec._editedBy = whoAmI();
+    rec._editedAt = new Date().toISOString();
+    await persist();
+    render();
+  };
+  form.querySelector('.cancel-btn').onclick = ()=> render();
+}
+
+async function deleteRecord(id, sectionKey){
+  if(!confirm('Delete this entry? This cannot be undone.')) return;
+  data[sectionKey] = data[sectionKey].filter(r=>r.id!==id);
+  await persist();
+  render();
+}
+
+function addNewRecord(sectionKey, presetClient){
+  const cfg = SECTIONS[sectionKey];
+  const rec = { id: uid() };
+  cfg.fields.forEach(f=> rec[f.key] = f.select ? f.select[f.select.length-1] : '' );
+  if(presetClient) rec.client = presetClient;
+  else if(!clientProfileMode && activeClient) rec.client = activeClient;
+  data[sectionKey] = data[sectionKey] || [];
+  data[sectionKey].unshift(rec);
+  render();
+  // open the new card's edit form immediately
+  const newCard = document.querySelector(`.card[data-id="${rec.id}"]`);
+  if(newCard) openEditForm(newCard, rec, sectionKey);
+}
+
+/* ============================= NAME CHANGE TABLE ============================= */
+function renderNameChangeTable(content){
+  let records = (data.namechange||[]).filter(matchesSearch);
+  records = records.slice().sort((a,b)=>a.client.localeCompare(b.client));
+  if(records.length===0){
+    content.innerHTML = '<div class="empty-note">No entries yet. Use "+ Add entry" to file the first client.</div>';
+    return;
+  }
+  const table = document.createElement('table');
+  table.className = 'nc-table';
+  table.innerHTML = `<thead><tr><th>Client</th><th>Name change allowed?</th><th></th></tr></thead><tbody></tbody>`;
+  const tbody = table.querySelector('tbody');
+  records.forEach(rec=>{
+    const tr = document.createElement('tr');
+    const stampClass = rec.allowed==='Yes' ? 'yes' : rec.allowed==='No' ? 'no' : 'unknown';
+    tr.innerHTML = `
+      <td class="nc-client">${esc(rec.client)}</td>
+      <td><span class="stamp ${stampClass} stamp-toggle">${esc(rec.allowed||'Unknown')}</span></td>
+      <td class="nc-actions">
+        <div class="icon-btn edit-nc" title="Edit client name" style="display:inline-flex;margin-right:4px;"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+        <div class="icon-btn del del-nc" title="Delete" style="display:inline-flex;"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></div>
+      </td>`;
+    tr.querySelector('.stamp-toggle').onclick = async ()=>{
+      const order = ['Yes','No','Unknown'];
+      const idx = order.indexOf(rec.allowed||'Unknown');
+      rec.allowed = order[(idx+1)%order.length];
+      rec._editedBy = whoAmI(); rec._editedAt = new Date().toISOString();
+      await persist();
+      render();
+    };
+    tr.querySelector('.edit-nc').onclick = ()=>{
+      const newName = prompt('Client name:', rec.client);
+      if(newName!==null && newName.trim()){
+        rec.client = newName.trim();
+        rec._editedBy = whoAmI(); rec._editedAt = new Date().toISOString();
+        persist().then(render);
+      }
+    };
+    tr.querySelector('.del-nc').onclick = async ()=>{
+      if(!confirm('Delete this client from the name-change table?')) return;
+      data.namechange = data.namechange.filter(r=>r.id!==rec.id);
+      await persist();
+      render();
+    };
+    tbody.appendChild(tr);
+  });
+  content.appendChild(table);
+}
+
+/* ============================= EVENTS ============================= */
+document.getElementById('addTopBtn').onclick = async ()=>{
+  if(activeSection==='namechange'){
+    const name = prompt('New client name:');
+    if(name && name.trim()){
+      data.namechange.unshift({id:uid(),client:name.trim(),allowed:'Unknown'});
+      await persist();
+      render();
+    }
+    return;
+  }
+  addNewRecord(activeSection);
+};
+document.getElementById('searchInput').oninput = (e)=>{ searchTerm = e.target.value; render(); };
+document.getElementById('refreshBtn').onclick = ()=> pollForChanges();
+document.getElementById('mobileToggle').onclick = ()=> document.getElementById('sidebar').classList.toggle('open');
+
+/* ============================= INIT ============================= */
+loadData();
+setInterval(pollForChanges, 6000);
+</script>
+</body>
+</html>
