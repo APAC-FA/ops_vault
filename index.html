@@ -372,7 +372,7 @@ function seedData(){
       'NoMachine','GoTo Resolve','X2Go','RealVNC','MeshCentral','Remotely','HopToDesk','TigerVNC','Duet Display',
       'join.me','Radmin','Microsoft Remote Desktop','Xrdp','Royal TSX','Remote Utilities','RemotePC','Aspia',
       'GoTo Meeting','AeroAdmin','AnyViewer','Jump Desktop','FreeRDP','Quick Assist','Mikogo'];
-      return apps.map(app=>({id:uid(),client:'Remote Access Tools (Reference)',app,notes:'',icon:REMOTE_APP_ICONS[app]||''}));
+      return apps.map(app=>({id:uid(),client:'',app,notes:'',icon:REMOTE_APP_ICONS[app]||''}));
     })(),
     troubleshooting:[
       {id:uid(),client:'Screen Sharing',question:"Can't Share Screen",answer:
@@ -568,7 +568,7 @@ function renderNav(){
 }
 // Every client name across every section, so the sidebar always reflects the whole vault
 const NON_CLIENT_SECTIONS = ['troubleshooting']; // categories here aren't real clients, keep them out of the sidebar filter
-const NON_CLIENT_NAMES = ['Remote Access Tools (Reference)']; // generic reference bucket, not a real client
+const NON_CLIENT_NAMES = ['']; // generic reference bucket, not a real client
 function allClientsGlobal(){
   const set = new Set();
   Object.keys(SECTIONS).forEach(sectionKey=>{
