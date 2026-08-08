@@ -537,17 +537,7 @@ function seedData(){
       {id:uid(),group:'general',label:'Rejoin',text:'Please close all browser windows completely, reopen your browser, and rejoin the test link.'},
       {id:uid(),group:'general',label:'Reboot',text:'Please restart your computer to reset your system audio, camera, and screen sharing drivers.'},
     ],
-    canned:[
-      {id:uid(),category:'session-start',label:'Welcome',text:'Hello! Thank you for joining. Before we begin, I\'ll need to verify your photo ID and complete a quick scan of your testing space.'},
-      {id:uid(),category:'session-start',label:'Room Scan Request',text:'Could you please pick up your webcam or phone camera and slowly scan your entire desk, the walls around you, and under the desk?'},
-      {id:uid(),category:'id-verification',label:'Photo ID Request',text:'Please hold up a valid, government-issued photo ID so I can verify your name matches your registration.'},
-      {id:uid(),category:'id-verification',label:'Name Mismatch',text:'I\'m seeing a difference between the name on your ID and your registration. Can you tell me more about that before we continue?'},
-      {id:uid(),category:'policy-reminders',label:'No Additional Materials',text:'Just a reminder that no notes, books, or additional devices are allowed at your desk during the exam unless specifically approved for this exam.'},
-      {id:uid(),category:'policy-reminders',label:'Stay in Frame',text:'Please remain fully visible within the camera frame for the duration of the exam.'},
-      {id:uid(),category:'session-end',label:'Exam Complete',text:'Your exam has been submitted successfully. Thank you for your time today — you\'re free to disconnect whenever you\'re ready.'},
-      {id:uid(),category:'session-end',label:'Results Timing',text:'Results are not available immediately in this session. Please check your email or the client portal for your official results.'},
-      {id:uid(),category:'general',label:'Technical Difficulty Acknowledgment',text:'Thanks for letting me know — I see the issue on my end too. Let\'s work through a few quick checks together.'},
-    ],
+    canned:[],
   };
 }
 function uid(){ return Math.random().toString(36).slice(2,10); }
