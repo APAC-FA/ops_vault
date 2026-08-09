@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -125,27 +125,6 @@
     font-weight:600;font-size:12.5px;padding:9px;border-radius:8px;cursor:pointer;
   }
   .refresh-btn:hover{border-color:var(--accent);color:var(--accent-dim);background:var(--accent-glow);}
-
-  /* ============================= THEME ============================= */
-function applyTheme(theme){
-  document.documentElement.setAttribute('data-theme', theme);
-  const label = document.getElementById('themeLabel');
-  if(label) label.textContent = theme === 'dark' ? 'Dark mode' : 'Light mode';
-}
-async function loadTheme(){
-  let theme = 'light';
-  try{
-    const res = await window.storage.get(THEME_KEY, false); // personal preference, not shared with the team
-    if(res && res.value) theme = res.value;
-  }catch(e){ /* no saved preference yet — default to light */ }
-  applyTheme(theme);
-}
-async function toggleTheme(){
-  const current = document.documentElement.getAttribute('data-theme') || 'light';
-  const next = current === 'dark' ? 'light' : 'dark';
-  applyTheme(next);
-  try{ await window.storage.set(THEME_KEY, next, false); }catch(e){ /* best effort */ }
-}
 
   /* ---------- Main (offset by the fixed sidebar's width) ---------- */
   .main{flex:1;min-width:0;display:flex;flex-direction:column;margin-left:260px;}
