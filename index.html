@@ -381,6 +381,8 @@ const SECTIONS = {
                fields:[{key:'client',label:'Category'},{key:'question',label:'Issue'},{key:'answer',label:'Steps',textarea:true}] },
   canned:    { label:'Canned Messages',     sub:'Click any message to copy it instantly. Follows the proctoring flow, split by SEB vs Non-SEB exams.', grouped:true,
                fields:[{key:'category',label:'Flow step'},{key:'label',label:'Label'},{key:'text',label:'Message',textarea:true},{key:'platform',label:'Platform tag (optional — ALL / WINDOWS / MAC / LINUX)'}] },
+  incidents: { label:'Incident Thresholds', sub:'Prohibited behaviors, items, and devices — context, category, severity, and point threshold per incident type.', grouped:false,
+               fields:[{key:'name',label:'Name'},{key:'context',label:'Context (Check in / Testing)'},{key:'category',label:'Category'},{key:'severity',label:'Severity (Minor / Major)'},{key:'threshold',label:'Threshold (0–1000)'}] },
 };
 
 // The exact proctoring flow, in order. "scope" controls whether a step shows under the
