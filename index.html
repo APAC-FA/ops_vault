@@ -453,6 +453,7 @@ function seedData(){
       {id:uid(),client:'CASBO',details:'ID check required: candidate must show photo + name; other identifying information may be covered.'},
       {id:uid(),client:'Atlassian',details:'Jira Essential: 60 minutes.\nManaging Jira Projects for Cloud: 180 minutes.\nJira Administration for Cloud: 180 minutes.\n\n• Nicknames Allowed\n• Water Glass/Bottle Allowed'},
       {id:uid(),client:'Zscaler',details:'ZDTA-CS/PS exam.'},
+      {id:uid(),client:'Akylade',details:'• Breaks Allowed\n• Water Glass/Bottle Allowed\n\nOne five-minute restroom break allowed, if requested.'},
       {id:uid(),client:'WellSky',details:'Allowed 5 minutes per break.\n\n• Breaks Allowed\n• Scratch Paper Allowed\n• Water Glass/Bottle Allowed\n• Notebook Allowed\n• Textbooks Allowed'},
       {id:uid(),client:'BMC',details:'• Breaks Allowed\n• Water Glass/Bottle Allowed\n• Scratch Paper Allowed\n\nNumber of breaks: 1 (one). Break duration: 5 minutes.'},
       {id:uid(),client:'Project Success',details:'• Scratch Paper Allowed'},
@@ -461,7 +462,7 @@ function seedData(){
       {id:uid(),client:'OpenText',details:'• Water Glass/Bottle Allowed'},
     ],
     namechange:[
-      ['Atlassian','No'],['BluePrism','Yes'],['BMC','No'],['Braze','Yes'],
+      ['Akylade','Yes'],['Atlassian','No'],['BluePrism','Yes'],['BMC','No'],['Braze','Yes'],
       ['Camunda','Yes'],['CASBO','Yes'],['CIW/Certification Partners','Yes'],['Collibra','No'],
       ['Docusign','No'],['F5 Certified','No'],['HashiCorp','No'],['InterSystems','No'],['NRPP','Yes'],
       ['NVIDIA','Yes'],['ProofPoint','Yes'],['Stripe','Yes'],['Toast','No'],['WellSky','Yes'],
@@ -469,7 +470,7 @@ function seedData(){
       ['Project Success','Yes'],
     ].map(([client,allowed])=>({id:uid(),client,allowed})),
     faqs:[
-      {id:uid(),client:'HashiCorp',category:'General',question:'What happens if I lose internet access during my appointment?',answer:'If you lose internet access during your exam, your progress will be saved automatically. You have up to 30 minutes to reconnect and continue. If you can't reconnect within that time, your completed work will be submitted for grading, and a member of the support team will follow up with next steps.'},
+      {id:uid(),client:'HashiCorp',category:'General',question:'What happens if I lose internet access during my appointment?',answer:'If the candidate is not able to return to the exam, a voucher will be issued. A member of the support team will follow up with next steps.'},
       {id:uid(),client:'HashiCorp',category:'General',question:'Can I use an external webcam?',answer:'Yes, as long as it meets the minimum requirements. It must be able to do a full scan of the testing environment and clearly show the text on your ID.'},
       {id:uid(),client:'HashiCorp',category:'General',question:'Can I use an external monitor?',answer:'Only one monitor may be used during the exam. If using an external monitor, the laptop screen must be closed, and the external monitor must have a webcam that stays on throughout — the laptop webcam cannot be used at the same time.'},
       {id:uid(),client:'HashiCorp',category:'General',question:'How do I reschedule my appointment?',answer:'More than 24 hours before your appointment:\n1. Log in to the HashiCorp Cloud Engineer Certification Exam Portal.\n2. Navigate to Certiverse via the left-side menu.\n3. From the Certiverse Exam Dashboard, find your appointment.\n4. Select Reschedule and pick a new date/time.'},
@@ -519,6 +520,7 @@ Source: Certiverse Identification Requirements — https://success.certiverse.co
         'CASBO':'https://www.casbo.org/learn-grow/',
         'Atlassian':'',
         'Zscaler':'https://help.zscaler.com/training-certification',
+        'Akylade':'https://support.akylade.com/portal/en/home',
         'WellSky':'https://training.wellsky.com/',
         'BMC':'',
         'Project Success':'',
@@ -716,7 +718,6 @@ Source: Certiverse Identification Requirements — https://success.certiverse.co
       {id:uid(),category:'exam-release',label:'Hide Chat Button',text:`You can click on the Hide Chat button at the top-right corner to begin your exam.`},
 
       // 7. Miscellaneous
-      {id:uid(),category:'misc',label:'Lost Proctor',text:`We apologize for the inconvenience. There was a temporary drop in the network. Please proceed. Thank you.`},
       {id:uid(),category:'misc',label:'Breaks Not Allowed',text:`Breaks are not allowed for this exam.`},
       {id:uid(),category:'misc',label:'Break Allowance — 5 Minutes',text:`You may take one 5-minute break during your exam. The session will be paused while you're away and resumed once you return. Please make sure to come back within 5 minutes, as exceeding this time is against Certiverse rules.`},
       {id:uid(),category:'misc',label:'Break Allowance — Multiple, As Needed',text:`You may take one 5-minute break at a time during your exam. You may take breaks whenever needed. The session will be paused while you are away and will resume once you return. Please make sure to come back within 5 minutes, as exceeding this time is against Certiverse rules.`},
@@ -732,8 +733,6 @@ Source: Certiverse Identification Requirements — https://success.certiverse.co
       {id:uid(),category:'misc',label:'Camera Framing',text:`Please adjust your camera. Your head and shoulders must remain fully visible during the exam.`},
       {id:uid(),category:'misc',label:'Welcome Back',text:`Welcome back!`},
       {id:uid(),category:'misc',label:'Resume Now',text:`Thank you. You may resume now.`},
-      {id:uid(),category:'misc',label:'Accomodation',text:`Unfortunately, accommodations can only be provided if they are requested and approved beforehand.`},
-      {id:uid(),category:'misc',label:'Future Accomodation Request',text:`Please submit an accommodations request at least three business days with your exam sponsor before your appointment to discuss your specific needs.`},
 
       // 8. Warnings
       {id:uid(),category:'warnings',label:'No Talking Aloud',text:`Please refrain from talking aloud.`},
