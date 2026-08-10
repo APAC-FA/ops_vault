@@ -182,6 +182,7 @@
   .group-head .scope-tag.seb{color:#7a3fc9;background:rgba(122,63,201,0.10);border-color:rgba(122,63,201,0.28);}
   .group-head .scope-tag.nonseb{color:#b8770a;background:rgba(184,119,10,0.10);border-color:rgba(184,119,10,0.28);}
   .group-head .scope-tag.misc{color:#1f7a4d;background:rgba(31,122,77,0.10);border-color:rgba(31,122,77,0.28);}
+  .group-head .scope-tag.multi{color:var(--navy-dim);background:var(--panel-3);border-color:var(--line);}
   .group-head .add-inline{margin-left:auto;}
 
   .card{
@@ -386,21 +387,39 @@ const SECTIONS = {
 // Non-SEB toggle, the SEB toggle, the Miscellaneous toggle, or all of them ('both').
 // Step 10 branches by exam type; everything else is shared unless flagged otherwise.
 const CANNED_FLOW = [
-  {key:'welcome',              num:1,  label:'Welcome',                         scope:'both'},
-  {key:'id-verification',      num:2,  label:'Identification Verification',     scope:'both'},
-  {key:'system-verification',  num:3,  label:'System Verification',             scope:'both'},
-  {key:'clear-desk',           num:4,  label:'Clear Desk',                      scope:'both'},
-  {key:'room-scan',            num:5,  label:'Room Scan',                       scope:'both'},
-  {key:'exam-release',         num:6,  label:'Exam Release',                    scope:'both'},
+  {key:'welcome',              num:1,  label:'Welcome',                         scope:['nonseb','seb']},
+  {key:'id-verification',      num:2,  label:'Identification Verification',     scope:['nonseb','seb']},
+  {key:'system-verification',  num:3,  label:'System Verification',             scope:'nonseb'},
+  {key:'clear-desk',           num:4,  label:'Clear Desk',                      scope:['nonseb','seb']},
+  {key:'room-scan',            num:5,  label:'Room Scan',                       scope:['nonseb','seb']},
+  {key:'exam-release',         num:6,  label:'Exam Release',                    scope:['nonseb','seb']},
   {key:'misc',                 num:7,  label:'Miscellaneous',                   scope:'misc'},
-  {key:'warnings',             num:8,  label:'Warnings',                        scope:'both'},
-  {key:'tech-support',         num:9,  label:'Technical Support',               scope:'both'},
+  {key:'warnings',             num:8,  label:'Warnings',                        scope:'misc'},
+  {key:'tech-support',         num:9,  label:'Technical Support',               scope:'misc'},
   {key:'nonseb',               num:10, label:'Non-SEB Exams',                   scope:'nonseb'},
   {key:'seb',                  num:10, label:'SEB — Secure Exam Browser',       scope:'seb'},
-  {key:'termination',          num:11, label:'Termination Messages',            scope:'both'},
+  {key:'termination',          num:11, label:'Termination Messages',            scope:'misc'},
 ];
+const ALL_FLOW_MODES = ['nonseb','seb','misc'];
+function includedModes(f){
+  if(f.scope==='both') return ALL_FLOW_MODES.slice();
+  if(Array.isArray(f.scope)) return f.scope;
+  return [f.scope];
+}
+function stepMatchesMode(f, mode){
+  return includedModes(f).includes(mode);
+}
 function getVisibleFlow(mode){
-  return CANNED_FLOW.filter(f=> f.scope==='both' || f.scope===mode);
+  return CANNED_FLOW.filter(f=> stepMatchesMode(f, mode));
+}
+const FLOW_MODE_LABELS = {nonseb:'Non-SEB', seb:'SEB', misc:'Miscellaneous'};
+// Human-readable badge describing which tab(s) a step is scoped to, or null if it shows everywhere.
+function scopeTagText(f){
+  const inc = includedModes(f);
+  if(inc.length===ALL_FLOW_MODES.length) return null;
+  if(inc.length===1) return FLOW_MODE_LABELS[inc[0]] + ' only';
+  const excluded = ALL_FLOW_MODES.filter(m=>!inc.includes(m));
+  return 'Not shown under ' + excluded.map(m=>FLOW_MODE_LABELS[m]).join(' or ');
 }
 function flowDef(key){ return CANNED_FLOW.find(f=>f.key===key); }
 
@@ -461,6 +480,29 @@ function seedData(){
       {id:uid(),client:'HashiCorp',category:'Exam Results',question:'HASHI-ASSOC — when will I see my results?',answer:'Pass/fail status is available in the Certiverse system immediately upon completing the exam.'},
       {id:uid(),client:'HashiCorp',category:'Exam Results',question:'HASHI-VAULT — when will I see my results?',answer:'An email with results is sent within 48 hours after the appointment.'},
       {id:uid(),client:'General',category:'Exam Results',question:'What does a "red screen" mean?',answer:'It means the system may have detected something that should not be opened or done during the exam.'},
+      {id:uid(),client:'General',category:'ID Verification',question:'What are the ID requirements for testing?',answer:
+`All IDs must be valid, government-issued originals (photocopies are not accepted) and must include:
+• The test-taker's name
+• A recent, recognizable photo.
+• The first and last names on the ID must match exactly the name used to register for the exam.
+
+Test-Takers Under 18
+A parent or guardian must present their own valid ID during check-in and provide consent for the test-taker to be recorded. The test-taker should also present a government-issued ID if they have one. If they do not have a government-issued ID, a student ID is acceptable.
+
+Acceptable Forms of ID
+• International travel passport
+• Driver's license
+• National, state, or provincial identification card
+• Alien registration card (green card or permanent resident/visa)
+
+Unacceptable Forms of ID
+• Expired IDs — IDs must be current and valid at the time of the exam.
+• Military IDs
+• Digital IDs — All IDs must be physical, government-issued documents with a clear photo and unaltered information. Digital IDs are not accepted.
+• Restricted access IDs — including the U.S. Department of Defense (DoD) Common Access Card (CAC) and similar secure access credentials.
+• IDs from restricted countries or regions — IDs issued by North Korea, Cuba, Syria, Sudan, Iran, or the Sevastopol/Crimea region of Ukraine are not accepted.
+
+Source: Certiverse Identification Requirements — https://success.certiverse.com/hc/en-us/articles/50836942992539-Certiverse-Identification-Requirements`},
       {id:uid(),client:'NVIDIA',category:'Breaks',question:'How many breaks am I allowed?',answer:'One 5-minute break is allowed. You may request it at any point in the exam — the exam pauses and resumes on your return. If the break runs longer than 5 minutes, the exam will be terminated.'},
     ],
     websites:(function(){
@@ -642,6 +684,11 @@ function seedData(){
       // 7. Miscellaneous
       {id:uid(),category:'misc',label:'Breaks Not Allowed',text:`Breaks are not allowed for this exam.`},
       {id:uid(),category:'misc',label:'Break Allowance — 5 Minutes',text:`You may take one 5-minute break during your exam. The session will be paused while you're away and resumed once you return. Please make sure to come back within 5 minutes, as exceeding this time is against Certiverse rules.`},
+      {id:uid(),category:'misc',label:'Break Allowance — Multiple, As Needed',text:`You may take one 5-minute break at a time during your exam. You may take breaks whenever needed. The session will be paused while you are away and will resume once you return. Please make sure to come back within 5 minutes, as exceeding this time is against Certiverse rules.`},
+      {id:uid(),category:'misc',label:'Return Time Reminder (Fill-in Minutes)',text:`Please make sure to come back within _ minutes, as exceeding this time is against Certiverse rules.`},
+      {id:uid(),category:'misc',label:'Custom Break Duration (Fill-in Minutes)',text:`You may now take a one _ minute break. Please make sure to come back within _ minutes, as exceeding this time is against Certiverse rules.`},
+      {id:uid(),category:'misc',label:'Resume Exam',text:`You may now resume your exam.`},
+      {id:uid(),category:'misc',label:'Pre-Resume Room Re-Scan',text:`Before we resume the exam, we will need to do a quick re-scan of the room and desk.`},
       {id:uid(),category:'misc',label:'Investigating Issue',text:`Please wait briefly while we investigate this issue.`},
       {id:uid(),category:'misc',label:'No Content Questions',text:`Sorry, but we cannot assist with content-related questions.`},
       {id:uid(),category:'misc',label:'Reschedule Email',text:`You can email support@certiverse.com for further assistance with rescheduling.`},
@@ -1016,7 +1063,6 @@ function renderNameChangeCard(rec){
       </div>
       <div class="card-actions">
         <div class="icon-btn status-edit-btn" title="Change declared status">${unlockIconSvg}</div>
-        <div class="icon-btn del del-btn" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></div>
       </div>
     </div>
     <div class="card-body">
@@ -1025,7 +1071,6 @@ function renderNameChangeCard(rec){
     </div>
   `;
   card.querySelector('.status-edit-btn').onclick = ()=> changeAllowedStatus(rec);
-  card.querySelector('.del-btn').onclick = ()=> deleteRecord(rec.id, 'namechange');
   return card;
 }
 
@@ -1063,15 +1108,9 @@ function renderCard(rec, sectionKey){
         <div class="card-title">${esc(titleText)}</div>
         <div class="card-meta">${esc(metaText)}</div>
       </div>
-      <div class="card-actions">
-        <div class="icon-btn edit-btn" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
-        <div class="icon-btn del del-btn" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></div>
-      </div>
     </div>
     <div class="card-body">${bodyHtml}</div>
   `;
-  card.querySelector('.edit-btn').onclick = ()=> openEditForm(card, rec, sectionKey);
-  card.querySelector('.del-btn').onclick = ()=> deleteRecord(rec.id, sectionKey);
   return card;
 }
 
@@ -1158,16 +1197,10 @@ function renderCannedMessages(content){
     groupEl.className = 'group';
     const head = document.createElement('div');
     head.className = 'group-head';
-    const scopeTagHtml = step.scope==='seb' ? `<span class="scope-tag seb">SEB only</span>`
-                        : step.scope==='nonseb' ? `<span class="scope-tag nonseb">Non-SEB only</span>`
-                        : step.scope==='misc' ? `<span class="scope-tag misc">Miscellaneous only</span>`
-                        : '';
+    const scopeText = scopeTagText(step);
+    const scopeClass = step.scope==='seb' ? 'seb' : step.scope==='nonseb' ? 'nonseb' : step.scope==='misc' ? 'misc' : 'multi';
+    const scopeTagHtml = scopeText ? `<span class="scope-tag ${scopeClass}">${esc(scopeText)}</span>` : '';
     head.innerHTML = `<h3><span class="flow-num">${step.num}</span>${esc(step.label)}</h3>${scopeTagHtml}<span class="tag">${records.length}</span>`;
-    const addBtn = document.createElement('button');
-    addBtn.className = 'btn ghost small add-inline';
-    addBtn.textContent = '+ Add message';
-    addBtn.onclick = ()=> addCannedMessage(step.key);
-    head.appendChild(addBtn);
     groupEl.appendChild(head);
 
     const list = document.createElement('div');
@@ -1196,8 +1229,6 @@ function renderCannedMessageCard(rec){
       </div>
       <div class="card-actions">
         <div class="icon-btn copy-btn" title="Copy to clipboard">${copyIconSvg}</div>
-        <div class="icon-btn edit-btn" title="Edit"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
-        <div class="icon-btn del del-btn" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></div>
       </div>
     </div>
     <div class="card-body qr-text">${esc(rec.text)}</div>
@@ -1206,8 +1237,6 @@ function renderCannedMessageCard(rec){
   // Whole-card click copies the message. Icon buttons stop propagation so they don't double-fire.
   card.onclick = ()=> copyToClipboard(rec.text, card, rec.label);
   card.querySelector('.copy-btn').onclick = (e)=>{ e.stopPropagation(); copyToClipboard(rec.text, card, rec.label); };
-  card.querySelector('.edit-btn').onclick = (e)=>{ e.stopPropagation(); openCannedMessageEdit(card, rec); };
-  card.querySelector('.del-btn').onclick = (e)=>{ e.stopPropagation(); deleteCannedMessage(rec.id); };
   return card;
 }
 
@@ -1264,7 +1293,8 @@ function openCannedMessageEdit(card, rec){
   const form = document.createElement('div');
   form.className = 'edit-form';
   const catOpts = CANNED_FLOW.map(f=>{
-    const scopeSuffix = f.scope==='seb' ? ' (SEB only)' : f.scope==='nonseb' ? ' (Non-SEB only)' : f.scope==='misc' ? ' (Miscellaneous only)' : '';
+    const scopeText = scopeTagText(f);
+    const scopeSuffix = scopeText ? ' (' + scopeText + ')' : '';
     return `<option value="${f.key}" ${rec.category===f.key?'selected':''}>${f.num}. ${esc(f.label)}${scopeSuffix}</option>`;
   }).join('');
   form.innerHTML = `
@@ -1328,25 +1358,9 @@ function renderNameChangeTable(content){
       <td><span class="stamp ${stampClass} locked" title="Locked — declared value">🔒 ${esc(rec.allowed||'Unknown')}</span></td>
       <td style="max-width:340px;font-size:12.5px;line-height:1.5;color:var(--text-dim);">${rec.allowed==='No' ? esc(NAME_CHANGE_NO_MESSAGE) : '<span class="empty-url">—</span>'}</td>
       <td class="nc-actions">
-        <div class="icon-btn status-edit-btn" title="Change declared status" style="display:inline-flex;margin-right:4px;">${unlockIconSvg}</div>
-        <div class="icon-btn edit-nc" title="Edit client name" style="display:inline-flex;margin-right:4px;"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
-        <div class="icon-btn del del-nc" title="Delete" style="display:inline-flex;"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg></div>
+        <div class="icon-btn status-edit-btn" title="Change declared status" style="display:inline-flex;">${unlockIconSvg}</div>
       </td>`;
     tr.querySelector('.status-edit-btn').onclick = ()=> changeAllowedStatus(rec);
-    tr.querySelector('.edit-nc').onclick = ()=>{
-      const newName = prompt('Client name:', rec.client);
-      if(newName!==null && newName.trim()){
-        rec.client = newName.trim();
-        rec._editedBy = whoAmI(); rec._editedAt = new Date().toISOString();
-        persist().then(render);
-      }
-    };
-    tr.querySelector('.del-nc').onclick = async ()=>{
-      if(!confirm('Delete this client from the name-change table?')) return;
-      data.namechange = data.namechange.filter(r=>r.id!==rec.id);
-      await persist();
-      render();
-    };
     tbody.appendChild(tr);
   });
   content.appendChild(table);
