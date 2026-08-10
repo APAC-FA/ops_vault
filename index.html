@@ -570,7 +570,17 @@ Source: Certiverse Identification Requirements — https://success.certiverse.co
    • Done → Restart & rejoin
    • Still failing → Continue to next step
 9. Use a different device
-10. End Goal: Screen sharing resolved ✓`},
+10. End Goal: Screen sharing resolved ✓`,
+      messages:[
+        {label:'Browser',              text:'Please ensure you are using Google Chrome or Microsoft Edge.'},
+        {label:'Permissions',          text:'Please ensure all required browser and device permissions are enabled.'},
+        {label:'Dual Monitor',         text:'Please ensure that only one monitor is connected. Disconnect any additional monitors.'},
+        {label:'VPN/Company Device',   text:'Please ensure your VPN is disabled. If you are using a company device, please switch to a personal device if possible.'},
+        {label:'Network',              text:'Please try connecting to a different network, such as a mobile hotspot or another Wi-Fi connection.'},
+        {label:'Rejoin',               text:'Please leave the exam session and rejoin.'},
+        {label:'Restart',              text:'Please restart your device and relaunch the exam session.'},
+        {label:'Different Device',     text:'If the issue persists, please try using a different device.'},
+      ]},
       {id:uid(),client:'Audio',question:'Microphone Not Working',answer:
 `1. Start: Microphone not working
 2. Using Chrome or Edge?
@@ -597,7 +607,18 @@ Source: Certiverse Identification Requirements — https://success.certiverse.co
    • Done → Restart & rejoin
    • Still failing → Continue to next step
 10. Use a different device
-11. End Goal: Microphone issue resolved ✓`},
+11. End Goal: Microphone issue resolved ✓`,
+      messages:[
+        {label:'Browser',              text:'Please ensure you are using Google Chrome or Microsoft Edge.'},
+        {label:'Microphone',           text:'Please ensure your microphone is not muted in your device settings.'},
+        {label:'Browser Permission',   text:'Please ensure microphone access is allowed in your browser settings.'},
+        {label:'Device Permission',    text:'Please ensure microphone access is enabled in your device settings.'},
+        {label:'Input Device',         text:'Please ensure the correct microphone is selected as your input device.'},
+        {label:'VPN/Company Device',   text:'Please ensure your VPN is disabled. If you are using a company device, please switch to a personal device if possible.'},
+        {label:'Rejoin',               text:'Please leave the exam session and rejoin.'},
+        {label:'Restart',              text:'Please restart your device and relaunch the exam session.'},
+        {label:'Different Device',     text:'If the issue persists, please try using a different device.'},
+      ]},
       {id:uid(),client:'Video',question:'Camera Not Working',answer:
 `1. Start: Camera not working
 2. Using Chrome or Edge?
@@ -624,7 +645,18 @@ Source: Certiverse Identification Requirements — https://success.certiverse.co
    • Done → Restart & rejoin
    • Still failing → Continue to next step
 10. Use a different device
-11. End Goal: Camera issue resolved ✓`},
+11. End Goal: Camera issue resolved ✓`,
+      messages:[
+        {label:'Browser',              text:'Please ensure you are using Google Chrome or Microsoft Edge.'},
+        {label:'Camera',               text:'Please ensure your camera is uncovered and turned on.'},
+        {label:'Browser Permission',   text:'Please ensure camera access is allowed in your browser settings.'},
+        {label:'Device Permission',    text:'Please ensure camera access is enabled in your device settings.'},
+        {label:'VPN/Company Device',   text:'Please ensure your VPN is disabled. If you are using a company device, please switch to a personal device if possible.'},
+        {label:'Network',              text:'Please try connecting to a different network, such as a mobile hotspot or another Wi-Fi connection.'},
+        {label:'Rejoin',               text:'Please leave the exam session and rejoin.'},
+        {label:'Restart',              text:'Please restart your device and relaunch the exam session.'},
+        {label:'Different Device',     text:'If the issue persists, please try using a different device.'},
+      ]},
     ],
     /* ---------------- Canned Messages — follows the numbered proctor flow ---------------- */
     canned:[
@@ -799,6 +831,24 @@ function backfillIncidents(){
     persist();
   }
 }
+// Older saved vaults were created before the Troubleshooting Guide had quick canned messages
+// attached to each issue — backfill just the messages onto matching entries, in place, without
+// touching any step-by-step text the team has already edited.
+function backfillTroubleshootingMessages(){
+  if(!data || !Array.isArray(data.troubleshooting)) return;
+  const seedTS = seedData().troubleshooting;
+  let changed = false;
+  data.troubleshooting.forEach(rec=>{
+    if(!Array.isArray(rec.messages) || rec.messages.length===0){
+      const match = seedTS.find(s=> s.client===rec.client);
+      if(match && Array.isArray(match.messages) && match.messages.length){
+        rec.messages = match.messages;
+        changed = true;
+      }
+    }
+  });
+  if(changed) persist();
+}
 
 /* ============================= STORAGE ============================= */
 async function loadData(){
@@ -809,6 +859,7 @@ async function loadData(){
       dataRaw = res.value;
       backfillCannedMessages();
       backfillIncidents();
+      backfillTroubleshootingMessages();
       setStatus('synced — shared with your team');
     } else {
       data = seedData();
@@ -1160,6 +1211,33 @@ function renderCard(rec, sectionKey){
     </div>
     <div class="card-body">${bodyHtml}</div>
   `;
+
+  if(sectionKey==='troubleshooting' && Array.isArray(rec.messages) && rec.messages.length){
+    const msgWrap = document.createElement('div');
+    msgWrap.style.cssText = 'margin-top:14px;padding-top:12px;border-top:1px dashed var(--line-soft);';
+    msgWrap.innerHTML = `<div style="font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-faint);margin-bottom:8px;">Quick canned messages — click to copy</div>`;
+    const grid = document.createElement('div');
+    grid.className = 'qr-grid';
+    rec.messages.forEach(m=>{
+      const chip = document.createElement('div');
+      chip.className = 'card qr-card';
+      chip.style.cssText = 'padding:12px 14px;margin-bottom:0;';
+      chip.title = 'Click to copy';
+      chip.innerHTML = `
+        <div class="card-top">
+          <div><div class="card-title" style="font-size:12.5px;">${esc(m.label)}</div></div>
+          <div class="card-actions"><div class="icon-btn copy-btn" title="Copy to clipboard">${copyIconSvg}</div></div>
+        </div>
+        <div class="card-body qr-text" style="margin-top:6px;">${esc(m.text)}</div>
+      `;
+      chip.onclick = ()=> copyToClipboard(m.text, chip, m.label);
+      chip.querySelector('.copy-btn').onclick = (e)=>{ e.stopPropagation(); copyToClipboard(m.text, chip, m.label); };
+      grid.appendChild(chip);
+    });
+    msgWrap.appendChild(grid);
+    card.appendChild(msgWrap);
+  }
+
   return card;
 }
 
