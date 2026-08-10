@@ -427,7 +427,7 @@ function flowDef(key){ return CANNED_FLOW.find(f=>f.key===key); }
 
 // Per-app icon reference for the Remote Desktop App tab, keyed by the app name used in seedData().remote.
 // Rendered inline on each app's card via .card-icon — no separate gallery needed.
-const REMOTE_APP_ICONS = {"UltraViewer": "data:image/png;base64,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"};
+const REMOTE_APP_ICONS = {"UltraViewer": "data:image/png;base64,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"};
 const REMOTE_APP_IMAGES = []; // legacy — kept only so old code paths that check this array don't error
 function remoteAppIcon(appName){ return REMOTE_APP_ICONS[appName] || null; }
 const STORAGE_KEY = 'ops-vault-data-v1';
@@ -743,6 +743,37 @@ Source: Certiverse Identification Requirements — https://success.certiverse.co
       {id:uid(),category:'termination',label:'Abusive Language',text:`Disrespectful or abusive language towards your proctor is prohibited. Under Certiverse rules, we are required to terminate this exam. If you have any questions, please reach out to support@certiverse.com.`},
       {id:uid(),category:'termination',label:'Integrity Compromised',text:`The integrity of this exam has been compromised. We are obliged to terminate your session. Please reach out to support@certiverse.com for further assistance.`},
     ],
+    /* ---------------- Incident Thresholds — prohibited behaviors, items & devices ---------------- */
+    incidents:[
+      {name:'Another person in the room',                                      context:'Check in, Testing', category:'Prohibited Behavior',         severity:'Minor', threshold:2},
+      {name:'Books / Supplemental Materials',                                  context:'Check in, Testing', category:'Prohibited Items',             severity:'Minor', threshold:2},
+      {name:'Camera',                                                          context:'Check in, Testing', category:'Prohibited Electronic Device', severity:'Minor', threshold:2},
+      {name:'Desk is not cleared off (only)',                                  context:'Check in, Testing', category:'Prohibited Items',             severity:'Minor', threshold:2},
+      {name:'Does not do complete scan: 360 room scan, desk/table top, under desk/table', context:'Check in', category:'Check in',                    severity:'Minor', threshold:1},
+      {name:'Eating/drinking without approved Special Accom',                  context:'Testing',           category:'Prohibited Behavior',         severity:'Minor', threshold:1},
+      {name:'Environment or camera view too dark/candidate not visible',       context:'Check in',          category:'Check in',                     severity:'Minor', threshold:2},
+      {name:'Face coverings',                                                  context:'Check in',          category:'Check in',                     severity:'Minor', threshold:2},
+      {name:'Face out of view',                                                context:'Testing',           category:'Prohibited Behavior',         severity:'Minor', threshold:2},
+      {name:'Failure to return from break',                                    context:'Testing',           category:'Prohibited Behavior',         severity:'Major', threshold:0},
+      {name:'Headphones/Earbuds',                                              context:'Check in',          category:'Prohibited Electronic Device', severity:'Minor', threshold:1},
+      {name:'Headwear (unless allowed via accommodation/religious exempt)',    context:'Check in',          category:'Prohibited Items',             severity:'Minor', threshold:1},
+      {name:'Internal environment too loud',                                  context:'Check in, Testing', category:'Prohibited Behavior',         severity:'Minor', threshold:2},
+      {name:'Leaves testing area',                                            context:'Testing',           category:'Prohibited Behavior',         severity:'Minor', threshold:1},
+      {name:'Looking elsewhere',                                              context:'Testing',           category:'Prohibited Behavior',         severity:'Minor', threshold:4},
+      {name:'Mobile phone in use',                                            context:'Testing',           category:'Prohibited Electronic Device', severity:'Major', threshold:0},
+      {name:'Mobile phone visible',                                           context:'Check in',          category:'Prohibited Electronic Device', severity:'Minor', threshold:1},
+      {name:'Not following proctor instructions',                             context:'Check in, Testing', category:'Prohibited Behavior',         severity:'Minor', threshold:2},
+      {name:'Proctor harassment (disrespectful, name calling)',                context:'Check in, Testing', category:'Prohibited Behavior',         severity:'Major', threshold:0},
+      {name:'Proper clothing',                                                context:'Check in',          category:'Prohibited Behavior',         severity:'Minor', threshold:1},
+      {name:'Remote Desktop Applications',                                    context:'Check in, Testing', category:'Prohibited Behavior',         severity:'Major', threshold:0},
+      {name:'Secondary device (computer, laptop, calculator)',                 context:'Check in',          category:'Prohibited Electronic Device', severity:'Minor', threshold:1},
+      {name:'Smart Watch',                                                    context:'Check in',          category:'Prohibited Electronic Device', severity:'Minor', threshold:1},
+      {name:'Smoking or Vaping',                                              context:'Check in, Testing', category:'Prohibited Behavior',         severity:'Minor', threshold:1},
+      {name:'Suspicious behavior',                                            context:'Testing',           category:'Prohibited Behavior',         severity:'Minor', threshold:2},
+      {name:'Talking aloud',                                                  context:'Testing',           category:'Prohibited Behavior',         severity:'Minor', threshold:2},
+      {name:'Talking to others',                                              context:'Testing',           category:'Prohibited Behavior',         severity:'Minor', threshold:2},
+      {name:'Whiteboard/bulletin board with writing',                         context:'Check in, Testing', category:'Prohibited Items',             severity:'Minor', threshold:2},
+    ].map(r=>({id:uid(), ...r})),
   };
 }
 function uid(){ return Math.random().toString(36).slice(2,10); }
@@ -759,6 +790,15 @@ function backfillCannedMessages(){
     persist();
   }
 }
+// Older saved vaults were created before the Incident Thresholds ledger existed — backfill it
+// in place without touching anything else the team has already filed.
+function backfillIncidents(){
+  if(!data) return;
+  if(!Array.isArray(data.incidents) || data.incidents.length===0){
+    data.incidents = seedData().incidents;
+    persist();
+  }
+}
 
 /* ============================= STORAGE ============================= */
 async function loadData(){
@@ -768,6 +808,7 @@ async function loadData(){
       data = JSON.parse(res.value);
       dataRaw = res.value;
       backfillCannedMessages();
+      backfillIncidents();
       setStatus('synced — shared with your team');
     } else {
       data = seedData();
@@ -850,7 +891,7 @@ function renderNav(){
   });
 }
 // Every client name across every section, so the sidebar always reflects the whole vault
-const NON_CLIENT_SECTIONS = ['troubleshooting','canned']; // categories here aren't real clients, keep them out of the sidebar filter
+const NON_CLIENT_SECTIONS = ['troubleshooting','canned','incidents']; // categories here aren't real clients, keep them out of the sidebar filter
 const NON_CLIENT_NAMES = ['Remote Access Tools (Reference)']; // generic reference bucket, not a real client
 function allClientsGlobal(){
   const set = new Set();
@@ -935,6 +976,7 @@ function render(){
   content.innerHTML = '';
 
   if(activeSection === 'namechange'){ renderNameChangeTable(content); return; }
+  if(activeSection === 'incidents'){ renderIncidentsTable(content); return; }
 
   // Canned Messages is a fully custom, flow-grouped ledger (own toggle, add/edit/copy/delete UI) — no generic list below it.
   if(activeSection === 'canned'){
@@ -1054,6 +1096,7 @@ async function changeAllowedStatus(rec){
   render();
 }
 const unlockIconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.6-1.8"/></svg>`;
+const trashIconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6h16Z"/></svg>`;
 const NAME_CHANGE_NO_MESSAGE = 'Unfortunately we will need to cancel this session. You can email support@certiverse.com for further assistance with rescheduling. Please confirm.';
 
 function renderNameChangeCard(rec){
@@ -1171,6 +1214,51 @@ function addNewRecord(sectionKey, presetClient){
   // open the new card's edit form immediately
   const newCard = document.querySelector(`.card[data-id="${rec.id}"]`);
   if(newCard) openEditForm(newCard, rec, sectionKey);
+}
+
+/* ============================= INCIDENT THRESHOLDS ============================= */
+function renderIncidentsTable(content){
+  let records = (data.incidents||[]).filter(matchesSearch);
+  records = records.slice().sort((a,b)=> a.name.localeCompare(b.name));
+  if(records.length===0){
+    content.innerHTML = '<div class="empty-note">No entries yet. Use "+ Add entry" to file the first incident type.</div>';
+    return;
+  }
+  const table = document.createElement('table');
+  table.className = 'nc-table';
+  table.innerHTML = `<thead><tr><th>Name</th><th>Context</th><th>Category</th><th>Severity</th><th>Threshold (0–1000)</th></tr></thead><tbody></tbody>`;
+  const tbody = table.querySelector('tbody');
+  records.forEach(rec=>{
+    const tr = document.createElement('tr');
+    const sevClass = rec.severity==='Major' ? 'no' : 'unknown';
+    tr.innerHTML = `
+      <td class="nc-client">${esc(rec.name)}</td>
+      <td>${esc(rec.context||'')}</td>
+      <td>${esc(rec.category||'')}</td>
+      <td><span class="stamp ${sevClass}">${esc(rec.severity||'')}</span></td>
+      <td style="font-family:var(--mono);">${esc(rec.threshold??'')}</td>`;
+    tbody.appendChild(tr);
+  });
+  content.appendChild(table);
+}
+
+async function addIncident(){
+  const name = prompt('Incident name:');
+  if(!name || !name.trim()) return;
+  const context = prompt('Context (e.g. Check in, Testing):', 'Check in') || '';
+  const category = prompt('Category (e.g. Prohibited Behavior, Prohibited Items, Prohibited Electronic Device):', 'Prohibited Behavior') || '';
+  let severity = prompt('Severity — type Minor or Major:', 'Minor') || 'Minor';
+  severity = severity.trim().toLowerCase()==='major' ? 'Major' : 'Minor';
+  let thresholdInput = prompt('Threshold (0–1000):', '1');
+  let threshold = parseInt(thresholdInput, 10);
+  if(isNaN(threshold)) threshold = 0;
+  threshold = Math.max(0, Math.min(1000, threshold));
+
+  const rec = { id: uid(), name: name.trim(), context: context.trim(), category: category.trim(), severity, threshold };
+  data.incidents = data.incidents || [];
+  data.incidents.unshift(rec);
+  await persist();
+  render();
 }
 
 /* ============================= CANNED MESSAGES ============================= */
@@ -1381,6 +1469,10 @@ document.getElementById('addTopBtn').onclick = async ()=>{
       await persist();
       render();
     }
+    return;
+  }
+  if(activeSection==='incidents'){
+    addIncident();
     return;
   }
   addNewRecord(activeSection);
