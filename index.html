@@ -478,6 +478,13 @@ let data = null;
 let dataRaw = null; // last serialized string, to detect remote changes
 let cannedFlowMode = 'nonseb'; // 'nonseb' | 'seb' | 'misc' — which flow the Canned Messages tab shows
 let flagDecisionTab = 'standard'; // 'standard' | 'escalation' — which sub-tab the Flag Decision Standard ledger shows
+let miscSubTab = 'misc'; // 'misc' | 'warnings' | 'tech-support' | 'termination' — sub-tab under Miscellaneous
+const MISC_SUBTABS = [
+  {key:'misc',         label:'Breaks'},
+  {key:'warnings',     label:'Warnings'},
+  {key:'tech-support', label:'Technical Support'},
+  {key:'termination',  label:'Termination Messages'},
+];
 
 /* ============================= SEED DATA ============================= */
 function seedData(){
@@ -1618,6 +1625,11 @@ function renderCannedMessages(content){
   toggleWrap.querySelector('#flowBtnSeb').onclick = ()=>{ cannedFlowMode='seb'; render(); };
   toggleWrap.querySelector('#flowBtnMisc').onclick = ()=>{ cannedFlowMode='misc'; render(); };
 
+  if(cannedFlowMode === 'misc'){
+    renderMiscellaneousGroup(content);
+    return;
+  }
+
   const visibleFlow = getVisibleFlow(cannedFlowMode);
   visibleFlow.forEach(step=>{
     const records = (data.canned||[]).filter(r=>r.category===step.key).filter(matchesSearch);
@@ -1643,6 +1655,46 @@ function renderCannedMessages(content){
   });
 }
 
+function renderMiscellaneousGroup(content){
+  const step = flowDef('misc'); // reuse its flow number (7) for the badge
+  const groupEl = document.createElement('div');
+  groupEl.className = 'group';
+
+  const head = document.createElement('div');
+  head.className = 'group-head';
+  const addBtn = document.createElement('button');
+  addBtn.className = 'btn ghost small add-inline';
+  addBtn.textContent = '+ Add';
+  addBtn.onclick = ()=> addCannedMessage(miscSubTab);
+  head.innerHTML = `<h3><span class="flow-num">${step ? step.num : ''}</span>Miscellaneous</h3>`;
+  head.appendChild(addBtn);
+  groupEl.appendChild(head);
+
+  const subToggleWrap = document.createElement('div');
+  subToggleWrap.className = 'flow-toggle-wrap';
+  subToggleWrap.style.marginBottom = '18px';
+  subToggleWrap.innerHTML = `<span class="flow-toggle-label">Category</span><div class="flow-toggle" id="miscSubToggle"></div>`;
+  const btnRow = subToggleWrap.querySelector('#miscSubToggle');
+  MISC_SUBTABS.forEach(tab=>{
+    const btn = document.createElement('button');
+    btn.textContent = tab.label;
+    if(miscSubTab === tab.key) btn.classList.add('active');
+    btn.onclick = ()=>{ miscSubTab = tab.key; render(); };
+    btnRow.appendChild(btn);
+  });
+  groupEl.appendChild(subToggleWrap);
+
+  const records = (data.canned||[]).filter(r=>r.category===miscSubTab).filter(matchesSearch);
+  const list = document.createElement('div');
+  list.className = 'qr-grid';
+  if(records.length===0){
+    list.innerHTML = '<div class="empty-note" style="padding:6px 0;">No canned messages filed yet for this category.</div>';
+  } else {
+    records.forEach(rec=> list.appendChild(renderCannedMessageCard(rec)) );
+  }
+  groupEl.appendChild(list);
+  content.appendChild(groupEl);
+}
 function renderCannedMessageCard(rec){
   const card = document.createElement('div');
   card.className = 'card qr-card';
